@@ -3,14 +3,27 @@ import asyncio
 from fastmcp import Client
 import os
 from dotenv import load_dotenv
+import httpx
 
 load_dotenv()
 
-endpoint_path = "mcp"
-if os.getenv("MCP_TRANSPORT") == "sse":
-    endpoint_path = "sse"
 
-client = Client("http://127.0.0.1:8000/" + endpoint_path)
+# Get Javelin API key
+api_key = os.getenv("JAVELIN_API_KEY", "your-api-key-here")
+
+class JavelinApiKeyAuth(httpx.Auth):
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+    
+    def auth_flow(self, request):
+        request.headers["x-javelin-apikey"] = self.api_key
+        yield request
+
+endpoint_path = "mcp"
+# if os.getenv("MCP_TRANSPORT") == "sse":
+#     endpoint_path = "sse"
+client = Client("https://javelin-guardrails.fastmcp.app/" + endpoint_path, 
+               auth=JavelinApiKeyAuth(api_key))
 
 async def test_prompt_injection():
     async with client:
