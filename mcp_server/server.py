@@ -16,9 +16,11 @@ try:
     print("✅ OpenAPI spec loaded")
 
     # Create HTTP client
+    api_key = os.getenv("JAVELIN_API_KEY","your-api-key")
+    
     client = httpx.AsyncClient(
         base_url="https://api-dev.javelin.live",
-        headers={"x-javelin-apikey": os.getenv("JAVELIN_API_KEY")}
+        headers={"x-javelin-apikey": api_key}
     )
     print("✅ HTTP client created")
 
@@ -29,6 +31,10 @@ try:
         name="Javelin Guardrails Server"
     )
     print("✅ MCP server created")
+
+    # Make server accessible for FastMCP inspection
+    server = mcp
+    app = mcp
 
     if __name__ == "__main__":
         print("Starting server on http://localhost:8000...")
